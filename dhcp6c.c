@@ -256,7 +256,7 @@ static void
 usage()
 {
 
-	fprintf(stderr, "usage: dhcp6c [-c configfile] [-dDfin] "
+	fprintf(stderr, "usage: dhcp6c [-c configfile] [-dDfintq] "
 	    "[-p pid-file] [interfaces...]\n");
 }
 
