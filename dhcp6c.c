@@ -1735,17 +1735,19 @@ client6_recvreply(struct dhcp6_if *ifp, struct dhcp6 *dh6,
 
 	/* update stateful configuration information */
 	if (state != DHCP6S_RELEASE) {
-		update_ia(IATYPE_PD, &optinfo->iapd_list, ifp,
-		    &optinfo->serverID, ev->authparam);
-		update_ia(IATYPE_NA, &optinfo->iana_list, ifp,
-		    &optinfo->serverID, ev->authparam);
+		if (! test_mode) {
+                    update_ia(IATYPE_PD, &optinfo->iapd_list, ifp,
+		        &optinfo->serverID, ev->authparam);
+		    update_ia(IATYPE_NA, &optinfo->iana_list, ifp,
+		        &optinfo->serverID, ev->authparam);
+		}
 	}
 
 	/*
 	 * Call the configuration script, if specified, to handle various
 	 * configuration parameters.
 	 */
-	client6_script(ifp->scriptpath, state, optinfo);
+	if (! test_mode) client6_script(ifp->scriptpath, state, optinfo);
 
 	dhcp6_remove_event(ev);
 
@@ -1762,7 +1764,7 @@ client6_recvreply(struct dhcp6_if *ifp, struct dhcp6 *dh6,
 
 	d_printf(LOG_DEBUG, FNAME, "got an expected reply, sleeping.");
 
-	if (infreq_mode) {
+	if (infreq_mode || exit_after) {
 		exit_ok = 1;
 		free_resources(NULL);
 		check_exit();
