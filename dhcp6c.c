@@ -1764,7 +1764,7 @@ client6_recvreply(struct dhcp6_if *ifp, struct dhcp6 *dh6,
 
 	d_printf(LOG_DEBUG, FNAME, "got an expected reply, sleeping.");
 
-	if (infreq_mode || exit_after) {
+	if (infreq_mode || quit_after) {
 		exit_ok = 1;
 		free_resources(NULL);
 		check_exit();
