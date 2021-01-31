@@ -159,7 +159,7 @@ main(int argc, char *argv[])
 	else
 		progname++;
 
-	while ((ch = getopt(argc, argv, "c:dDfinp:")) != -1) {
+	while ((ch = getopt(argc, argv, "c:dDfinptq:")) != -1) {
 		switch (ch) {
 		case 'c':
 			conffile = optarg;
