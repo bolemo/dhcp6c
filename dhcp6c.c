@@ -174,6 +174,9 @@ main(int argc, char *argv[])
 		case 'i':
 			infreq_mode = 1;
 			break;
+		case 't':
+			test_mode = 1;
+			break;
 		case 'n':
 			opt_norelease = 1;
 			break;
