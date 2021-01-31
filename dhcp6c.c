@@ -101,6 +101,7 @@ static struct keyinfo *ctlkey = NULL;
 static int ctldigestlen;
 
 static int infreq_mode = 0;
+static int test_mode = 0;
 
 int opt_norelease;
 
