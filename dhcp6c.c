@@ -102,6 +102,7 @@ static int ctldigestlen;
 
 static int infreq_mode = 0;
 static int test_mode = 0;
+static int quit_after = 0;
 
 int opt_norelease;
 
@@ -177,6 +178,9 @@ main(int argc, char *argv[])
 			break;
 		case 't':
 			test_mode = 1;
+			break;
+		case 'q':
+			quit_after = 1;
 			break;
 		case 'n':
 			opt_norelease = 1;
