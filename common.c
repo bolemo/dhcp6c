@@ -1074,7 +1074,7 @@ get_duid(idfile, duid, duidtype)
 {
 	FILE *fp = NULL;
 	uint16_t len = 0, hwtype;
-	struct dhcp6opt_duid_type1 *dp; /* we only support the type1 DUID */
+	struct dhcp6opt_duid_type1 *dp; /* we only support the type1 and type3 DUID */
 	char tmpbuf[256];	/* DUID should be no more than 256 bytes */
 
 	if ((fp = fopen(idfile, "r")) == NULL && errno != ENOENT)
@@ -1119,15 +1119,19 @@ get_duid(idfile, duid, duidtype)
 		uint64_t t64;
 
 		dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
-		dp->dh6_duid1_type = htons(1); /* type 1 */
+		dp->dh6_duid1_type = htons(duidtype); /* type 1 or 3 */
 		dp->dh6_duid1_hwtype = htons(hwtype);
-		/* time is Jan 1, 2000 (UTC), modulo 2^32 */
-		t64 = (uint64_t)(time(NULL) - 946684800);
-		dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
+		if (duidtype == 1) {
+			/* time is Jan 1, 2000 (UTC), modulo 2^32 */
+			t64 = (uint64_t)(time(NULL) - 946684800);
+			dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
+		} else {
+			dp->dh6_duid1_time = null;
+		}
 		memcpy((void *)(dp + 1), tmpbuf, (len - sizeof(*dp)));
 
-		d_printf(LOG_DEBUG, FNAME, "generated a new DUID: %s",
-		    duidstr(duid));
+		d_printf(LOG_DEBUG, FNAME, "generated a new DUID type %d: %s",
+		    duidtype , duidstr(duid));
 	}
 
 	/* save the (new) ID to the file for next time */
