@@ -1074,7 +1074,13 @@ get_duid(idfile, duid, duidtype)
 {
 	FILE *fp = NULL;
 	uint16_t len = 0, hwtype;
-	struct dhcp6opt_duid_type1 *dp; /* we only support the type1 and type3 DUID */
+	if (duidtype == 1) {
+		struct dhcp6opt_duid_type1 *dp; /* type1 DUID */
+		static int duid_struct_size = sizeof(struct dhcp6opt_duid_type1);
+	} else {
+		struct dhcp6opt_duid_type3 *dp; /* type3 DUID */
+		static int duid_struct_size = sizeof(struct dhcp6opt_duid_type3);
+	}
 	char tmpbuf[256];	/* DUID should be no more than 256 bytes */
 
 	if ((fp = fopen(idfile, "r")) == NULL && errno != ENOENT)
@@ -1095,7 +1101,7 @@ get_duid(idfile, duid, duidtype)
 			    "failed to get a hardware address");
 			goto fail;
 		}
-		len = l + sizeof(struct dhcp6opt_duid_type1);
+		len = l + duid_struct_size;
 	}
 
 	memset(duid, 0, sizeof(*duid));
@@ -1118,15 +1124,17 @@ get_duid(idfile, duid, duidtype)
 	} else {
 		uint64_t t64;
 
-		dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
-		dp->dh6_duid1_type = htons(duidtype); /* type 1 or 3 */
-		dp->dh6_duid1_hwtype = htons(hwtype);
 		if (duidtype == 1) {
+			dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
+			dp->dh6_duid1_type = htons(1);
+			dp->dh6_duid1_hwtype = htons(hwtype);
 			/* time is Jan 1, 2000 (UTC), modulo 2^32 */
 			t64 = (uint64_t)(time(NULL) - 946684800);
 			dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
 		} else {
-			dp->dh6_duid1_time = NULL;
+			dp = (struct dhcp6opt_duid_type3 *)duid->duid_id;
+			dp->dh6_duid3_type = htons(3);
+			dp->dh6_duid3_hwtype = htons(hwtype);
 		}
 		memcpy((void *)(dp + 1), tmpbuf, (len - sizeof(*dp)));
 
