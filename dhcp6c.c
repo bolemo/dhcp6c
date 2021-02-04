@@ -103,6 +103,7 @@ static int ctldigestlen;
 static int infreq_mode = 0;
 static int test_mode = 0;
 static int quit_after = 0;
+static int duidc_type = 1;
 
 int opt_norelease;
 
@@ -159,7 +160,7 @@ main(int argc, char *argv[])
 	else
 		progname++;
 
-	while ((ch = getopt(argc, argv, "c:dDfintqp:")) != -1) {
+	while ((ch = getopt(argc, argv, "c:dDfintq3p:")) != -1) {
 		switch (ch) {
 		case 'c':
 			conffile = optarg;
@@ -184,6 +185,9 @@ main(int argc, char *argv[])
 			break;
 		case 'n':
 			opt_norelease = 1;
+			break;
+		case '3':
+			duidc_type = 3;
 			break;
 		case 'p':
 			pid_file = optarg;
@@ -256,7 +260,7 @@ static void
 usage()
 {
 
-	fprintf(stderr, "usage: dhcp6c [-c configfile] [-dDfintq] "
+	fprintf(stderr, "usage: dhcp6c [-c configfile] [-dDfintq3] "
 	    "[-p pid-file] [interfaces...]\n");
 }
 
@@ -270,7 +274,7 @@ client6_init(void)
 	int error, on = 0;
 
 	/* get our DUID */
-	if (get_duid(DUID_FILE, &client_duid)) {
+	if (get_duid(DUID_FILE, &client_duid, duidc_type)) {
 		d_printf(LOG_ERR, FNAME, "failed to get a DUID");
 		exit(1);
 	}
