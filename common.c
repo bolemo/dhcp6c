@@ -1068,7 +1068,7 @@ in6_matchflags(addr, ifnam, flags)
 }
 
 int
-get_duid(idfile, duid)
+get_duid(idfile, duid, duidtype)
 	const char *idfile;
 	struct duid *duid;
 {
