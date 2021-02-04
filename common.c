@@ -1126,7 +1126,7 @@ get_duid(idfile, duid, duidtype)
 			t64 = (uint64_t)(time(NULL) - 946684800);
 			dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
 		} else {
-			dp->dh6_duid1_time = null;
+			dp->dh6_duid1_time = NULL;
 		}
 		memcpy((void *)(dp + 1), tmpbuf, (len - sizeof(*dp)));
 
