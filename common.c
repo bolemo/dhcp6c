@@ -1076,9 +1076,10 @@ get_duid(idfile, duid, duidtype)
 	FILE *fp = NULL;
 	uint16_t len = 0, hwtype;
 	char tmpbuf[256];	/* DUID should be no more than 256 bytes */
+	static int duid_struct_size;
 	switch(duidtype) {
-		case 1: static int duid_struct_size = sizeof(struct dhcp6opt_duid_type1); break;
-		case 3: static int duid_struct_size = sizeof(struct dhcp6opt_duid_type3); break;
+		case 1: duid_struct_size = sizeof(struct dhcp6opt_duid_type1); break;
+		case 3: duid_struct_size = sizeof(struct dhcp6opt_duid_type3); break;
 		default:
 			d_printf(LOG_ERR, FNAME, "Unsupported DUID type: %d", duidtype);
 			goto fail;
