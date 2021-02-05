@@ -1125,7 +1125,7 @@ get_duid(idfile, duid, duidtype)
 		    idfile, duidstr(duid));
 	} else {
 		switch (duidtype) {
-		case 1:
+		case 1: {
 			uint64_t t64;
 			struct dhcp6opt_duid_type1* dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
 			dp->dh6_duid1_type = htons(1);
@@ -1133,13 +1133,16 @@ get_duid(idfile, duid, duidtype)
 			/* time is Jan 1, 2000 (UTC), modulo 2^32 */
 			t64 = (uint64_t)(time(NULL) - 946684800);
 			dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
+			memcpy((void *)(dp + 1), tmpbuf, (len - duid_struct_size));
+			}
 			break;
-		case 3:
+		case 3: {
 			struct dhcp6opt_duid_type3* dp = (struct dhcp6opt_duid_type3 *)duid->duid_id;
 			dp->dh6_duid3_type = htons(3);
 			dp->dh6_duid3_hwtype = htons(hwtype);
+			memcpy((void *)(dp + 1), tmpbuf, (len - duid_struct_size));
+			}
 		}
-		memcpy((void *)(dp + 1), tmpbuf, (len - sizeof(*dp)));
 
 		d_printf(LOG_DEBUG, FNAME, "generated a new DUID type %d: %s",
 		    duidtype , duidstr(duid));
