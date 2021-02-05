@@ -1075,14 +1075,13 @@ get_duid(idfile, duid, duidtype)
 {
 	FILE *fp = NULL;
 	uint16_t len = 0, hwtype;
-	if (duidtype == 1) {
-		struct dhcp6opt_duid_type1 *dp; /* type1 DUID */
-		static int duid_struct_size = sizeof(struct dhcp6opt_duid_type1);
-	} else {
-		struct dhcp6opt_duid_type3 *dp; /* type3 DUID */
-		static int duid_struct_size = sizeof(struct dhcp6opt_duid_type3);
-	}
 	char tmpbuf[256];	/* DUID should be no more than 256 bytes */
+	if (duidtype == 1) static int duid_struct_size = sizeof(struct dhcp6opt_duid_type1);
+	else if (duidtype == 3) static int duid_struct_size = sizeof(struct dhcp6opt_duid_type3);
+	else {
+		d_printf(LOG_ERR, FNAME, "Unsupported DUID type: %d", duidtype);
+		goto fail;
+	}
 
 	if ((fp = fopen(idfile, "r")) == NULL && errno != ENOENT)
 		d_printf(LOG_NOTICE, FNAME, "failed to open DUID file: %s",
@@ -1123,7 +1122,8 @@ get_duid(idfile, duid, duidtype)
 		    "extracted an existing DUID from %s: %s",
 		    idfile, duidstr(duid));
 	} else {
-		if (duidtype == 1) {
+		switch (duidtype) {
+		case 1:
 			uint64_t t64;
 			struct dhcp6opt_duid_type1* dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
 			dp->dh6_duid1_type = htons(1);
@@ -1131,7 +1131,8 @@ get_duid(idfile, duid, duidtype)
 			/* time is Jan 1, 2000 (UTC), modulo 2^32 */
 			t64 = (uint64_t)(time(NULL) - 946684800);
 			dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
-		} else {
+			break;
+		case 3:
 			struct dhcp6opt_duid_type3* dp = (struct dhcp6opt_duid_type3 *)duid->duid_id;
 			dp->dh6_duid3_type = htons(3);
 			dp->dh6_duid3_hwtype = htons(hwtype);
