@@ -1071,6 +1071,7 @@ int
 get_duid(idfile, duid, duidtype)
 	const char *idfile;
 	struct duid *duid;
+	int duidtype;
 {
 	FILE *fp = NULL;
 	uint16_t len = 0, hwtype;
@@ -1122,17 +1123,16 @@ get_duid(idfile, duid, duidtype)
 		    "extracted an existing DUID from %s: %s",
 		    idfile, duidstr(duid));
 	} else {
-		uint64_t t64;
-
 		if (duidtype == 1) {
-			dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
+			uint64_t t64;
+			struct dhcp6opt_duid_type1* dp = (struct dhcp6opt_duid_type1 *)duid->duid_id;
 			dp->dh6_duid1_type = htons(1);
 			dp->dh6_duid1_hwtype = htons(hwtype);
 			/* time is Jan 1, 2000 (UTC), modulo 2^32 */
 			t64 = (uint64_t)(time(NULL) - 946684800);
 			dp->dh6_duid1_time = htonl((u_long)(t64 & 0xffffffff));
 		} else {
-			dp = (struct dhcp6opt_duid_type3 *)duid->duid_id;
+			struct dhcp6opt_duid_type3* dp = (struct dhcp6opt_duid_type3 *)duid->duid_id;
 			dp->dh6_duid3_type = htons(3);
 			dp->dh6_duid3_hwtype = htons(hwtype);
 		}
